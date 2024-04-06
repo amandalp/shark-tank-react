@@ -52,13 +52,14 @@ const HomePage = () => {
       </Stack>
       <Stack alignItems="center" height="100%" my={5}>
         <img src="logo.png" width="500px"></img>
+        <Typography variant="h4" fontFamily="Raleway" fontWeight="300" my={8}>VC in your pocket</Typography>
         <Stack direction="row" my={10}>
           <Typography fontFamily="Raleway" fontWeight="500" variant="h3" mr={3}>Try pitching your idea to</Typography>
           <Box borderBottom="3px solid" minWidth={430}>
             <Typography fontFamily="Raleway" fontWeight="400" variant="h3" display="inline" ml={3} color="#333333">{person}</Typography>
           </Box>
         </Stack>
-        <Stack direction="row" justifyContent="center" spacing={6} mt={6} flexWrap="wrap" maxWidth={1000}>
+        <Stack direction="row" justifyContent="center" spacing={6} my={6} flexWrap="wrap" maxWidth={1000}>
           <StyledAvatar name="Mark Cuban" src="markcuban.png" />
           <StyledAvatar name="Sheryl Sandberg" src="sherylsandberg.png" />
           <StyledAvatar name="Paul Graham" src="paulgraham.png" />
