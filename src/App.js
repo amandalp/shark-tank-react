@@ -11,12 +11,8 @@ function App() {
   return (
     <Router>
         <Routes>
-        {/* <Route path="/" element={<Layout />}> */}
           <Route index element={<HomePage />} />
           <Route exact path="/:person" element={<Simulator/>} />
-          {/* <Route path="about" element={} /> */}
-          {/* <Route exact path="/:id" component= {DashboardContainer} /> */} 
-          {/* </Route> */}
         </Routes>
     </Router>
   );
