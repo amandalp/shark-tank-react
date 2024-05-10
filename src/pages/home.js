@@ -63,9 +63,7 @@ const HomePage = () => {
           <StyledAvatar name="Mark Cuban" src="markcuban.png" />
           <StyledAvatar name="Sheryl Sandberg" src="sherylsandberg.png" />
           <StyledAvatar name="Paul Graham" src="paulgraham.png" />
-          <StyledAvatar name="Joshua Rahn" src="josh.png" />
-          <StyledAvatar name="Sam Altman" src="samaltman.png" />
-          <StyledAvatar name="Ethan Steininger" src="ethan.png" />
+          <StyledAvatar name="Jeff Bezos" src="jeffbezos.png" />
           <StyledAvatar name="Marc Andreessen" src="marcandreessen.png" />
         </Stack>
       </Stack>
