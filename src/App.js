@@ -11,8 +11,8 @@ function App() {
   return (
     <Router>
         <Routes>
-          <Route index element={<HomePage />} />
-          <Route exact path="/:person" element={<Simulator/>} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:personKey" element={<Simulator />} />
         </Routes>
     </Router>
   );
@@ -20,4 +20,3 @@ function App() {
 
 
 export default App;
-
