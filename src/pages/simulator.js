@@ -6,6 +6,11 @@ import StopCircleIcon from '@mui/icons-material/StopCircle';
 import axios from 'axios';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
+// todo: Try testing out adding more descriptive prompts
+// todo: Try using Claude and see the difference
+// todo: For the local vc's just use the prompt to add in personalities, could even potentially include articles in the prompt?
+// todo: Add a timer in the frontend with instructions for they have 45 to 60 seconds for their pitch
+// todo: chagne the state so that it resets and clears at the end of each full round
 const personalities = {
 	mark_cuban: {
 		name: "Mark Cuban",
@@ -142,18 +147,19 @@ Participant's idea: ${transcript}
         }
     };
 
-	console.log("responseready", responseReady);
+    console.log("responseready", responseReady);
+    // todo: change the trnary operator so that it starts with if the response is not ready
+    // also take out the original transcript on the response back to the shark
+    // todo: change the name so there's not the underscore
     return (
         <>
             <Stack alignItems="center" height="100%" my={8}>
-				// todo: change the trnary operator so that it starts with if the response is not ready
-				// also take out the original transcript on the response back to the shark
 				{responseReady ? <></> : (
 					<>
-                		<Typography fontFamily="Raleway" variant="h3">Make your pitch to {decodeURI(window.location.pathname).slice(1)}!</Typography>
-                		<Typography fontFamily="Raleway" variant="h6" fontWeight={300} mt={4}>Click on the mic to start</Typography>
-                		<p>Microphone: {listening ? 'on' : 'off'}</p>
-                		<p>Transcript: {transcript}</p>
+                		<Typography fontFamily="Raleway" variant="h3">Ready to pitch your startup to {decodeURI(window.location.pathname).slice(1)}?</Typography>
+                		<Typography fontFamily="Raleway" variant="h4" fontWeight={300} mt={4}>You have 45 seconds. Click on the mic to start!</Typography>
+                		<p>Microphone: {listening ? 'ON' : 'OFF'}</p>
+                		<p>Captions: {transcript}</p>
                 		<Button onClick={resetTranscript}>Reset Transcript</Button>
                 		{!isLoading && !responseReady && (
                 		    <IconButton sx={{mt: 15, mb:4}} onClick={startRecording}>
