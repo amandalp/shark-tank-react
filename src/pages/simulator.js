@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { Box, Button, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
@@ -45,15 +45,84 @@ const personalities = {
 }
 
 const Simulator = () => {
-	const { personKey } = useParams();
-	const [personality, setPersonality] = useState({});
-	const [selectedPerson, setSelectedPerson] = useState(null);
-	const { transcript, listening, resetTranscript, startListening, stopListening, browserSupportsSpeechRecognition } = useSpeechRecognition();
+    const { personKey } = useParams();
+    const [personality, setPersonality] = useState({});
+    const [selectedPerson, setSelectedPerson] = useState(null);
+    const { transcript, listening, resetTranscript, startListening, stopListening, browserSupportsSpeechRecognition } = useSpeechRecognition();
     const [isRecording, setIsRecording] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [responseReady, setResponseReady] = useState(false);
     const [apiResponse, setApiResponse] = useState('');
     const [videoUrl, setVideoUrl] = useState('');
+    const Ref = useRef(null);
+
+    // The state for our timer
+    const [timer, setTimer] = useState("00:00:00");
+
+    const getTimeRemaining = (e) => {
+        const total =
+            Date.parse(e) - Date.parse(new Date());
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor(
+            (total / 1000 / 60) % 60
+        );
+        const hours = Math.floor(
+            (total / 1000 / 60 / 60) % 24
+        );
+        return {
+            total,
+            hours,
+            minutes,
+            seconds,
+        };
+    };
+
+    const startTimer = (e) => {
+        let { total, hours, minutes, seconds } =
+            getTimeRemaining(e);
+        if (total >= 0) {
+            // update the timer
+            // check if less than 10 then we need to
+            // add '0' at the beginning of the variable
+            setTimer(
+                (hours > 9 ? hours : "0" + hours) +
+                ":" +
+                (minutes > 9
+                    ? minutes
+                    : "0" + minutes) +
+                ":" +
+                (seconds > 9 ? seconds : "0" + seconds)
+            );
+        }
+    };
+
+    const clearTimer = (e) => {
+        // If you adjust it you should also need to
+        // adjust the Endtime formula we are about
+        // to code next
+        setTimer("00:00:45");
+ 
+        // If you try to remove this line the
+        // updating of timer Variable will be
+        // after 1000ms or 1sec
+        if (Ref.current) clearInterval(Ref.current);
+        const id = setInterval(() => {
+            startTimer(e);
+        }, 1000);
+        Ref.current = id;
+    };
+
+    const getDeadTime = () => {
+        let deadline = new Date();
+ 
+        // This is where you need to adjust if
+        // you entend to add more time
+        deadline.setSeconds(deadline.getSeconds() + 45);
+        return deadline;
+
+	// todo: still need to handle to stop recording when it reaches 0?
+	// todo: need to handle if you stop before the time runs out so that when you stop recording it also stops the timer
+    };
 
     useEffect(() => {
 		const normalizedKey = personKey.toLowerCase();
@@ -83,6 +152,7 @@ const Simulator = () => {
     const startRecording = () => {
         SpeechRecognition.startListening({ continuous: true });
         setIsRecording(true);
+	clearTimer(getDeadTime());
     };
 
 	// call openai api
@@ -154,20 +224,21 @@ Participant's idea: ${transcript}
     return (
         <>
             <Stack alignItems="center" height="100%" my={8}>
-				{responseReady ? <></> : (
-					<>
-                		<Typography fontFamily="Raleway" variant="h3">Ready to pitch your startup to {decodeURI(window.location.pathname).slice(1)}?</Typography>
-                		<Typography fontFamily="Raleway" variant="h4" fontWeight={300} mt={4}>You have 45 seconds. Click on the mic to start!</Typography>
-                		<p>Microphone: {listening ? 'ON' : 'OFF'}</p>
-                		<p>Captions: {transcript}</p>
-                		<Button onClick={resetTranscript}>Reset Transcript</Button>
-                		{!isLoading && !responseReady && (
-                		    <IconButton sx={{mt: 15, mb:4}} onClick={startRecording}>
-                		        <MicIcon sx={{fontSize: "200px"}}/>
-                		    </IconButton>
-                		)}
-					</>
-				)}
+		{responseReady ? <></> : (
+		    <>
+                	<Typography fontFamily="Raleway" variant="h2">Ready to pitch your startup to {decodeURI(window.location.pathname).slice(1)}?</Typography>
+                	<Typography fontFamily="Raleway" variant="h4" fontWeight={300} mt={4}>You have 45 seconds. Click on the mic below to start!</Typography>
+                	{!isLoading && !responseReady && (
+			    <div style={{ textAlign: "center", margin: "auto" }}>
+            			<h2>{timer}</h2>
+                	    <IconButton sx={{mt: 15, mb:4}} onClick={startRecording}>
+                		<MicIcon sx={{fontSize: "200px"}}/>
+                	    </IconButton>
+        		    </div>
+                	)}
+                	<p>Captions: {transcript}</p>
+		    </>
+		)}
                 {isRecording && (
                     <>
                         <img src="recording.gif" alt="Recording" width="50px" />
