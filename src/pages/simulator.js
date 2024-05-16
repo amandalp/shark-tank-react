@@ -142,19 +142,26 @@ Participant's idea: ${transcript}
         }
     };
 
+	console.log("responseready", responseReady);
     return (
         <>
             <Stack alignItems="center" height="100%" my={8}>
-                <Typography fontFamily="Raleway" variant="h3">Make your pitch to {decodeURI(window.location.pathname).slice(1)}!</Typography>
-                <Typography fontFamily="Raleway" variant="h6" fontWeight={300} mt={4}>Click on the mic to start</Typography>
-                <p>Microphone: {listening ? 'on' : 'off'}</p>
-                <p>Transcript: {transcript}</p>
-                <Button onClick={resetTranscript}>Reset Transcript</Button>
-                {!isLoading && !responseReady && (
-                    <IconButton sx={{mt: 15, mb:4}} onClick={startRecording}>
-                        <MicIcon sx={{fontSize: "200px"}}/>
-                    </IconButton>
-                )}
+				// todo: change the trnary operator so that it starts with if the response is not ready
+				// also take out the original transcript on the response back to the shark
+				{responseReady ? <></> : (
+					<>
+                		<Typography fontFamily="Raleway" variant="h3">Make your pitch to {decodeURI(window.location.pathname).slice(1)}!</Typography>
+                		<Typography fontFamily="Raleway" variant="h6" fontWeight={300} mt={4}>Click on the mic to start</Typography>
+                		<p>Microphone: {listening ? 'on' : 'off'}</p>
+                		<p>Transcript: {transcript}</p>
+                		<Button onClick={resetTranscript}>Reset Transcript</Button>
+                		{!isLoading && !responseReady && (
+                		    <IconButton sx={{mt: 15, mb:4}} onClick={startRecording}>
+                		        <MicIcon sx={{fontSize: "200px"}}/>
+                		    </IconButton>
+                		)}
+					</>
+				)}
                 {isRecording && (
                     <>
                         <img src="recording.gif" alt="Recording" width="50px" />
@@ -166,10 +173,9 @@ Participant's idea: ${transcript}
                 {isLoading && <Box sx={{ display: 'flex' }}><CircularProgress size="large" color="secondary"/></Box>}
                 {responseReady && (
                     <>
-                        {JSON.stringify(apiResponse)}
-                        <Box>
+                        <Box height={"100vh"} width={"100%"}>
                             {videoUrl && (
-                                <video width="700" controls autoPlay>
+                                <video style={{width: '100%', height: '100%'}} controls autoPlay>
                                     <source src={videoUrl} type="video/mp4" />
                                     Your browser does not support the video tag.
                                 </video>
