@@ -176,7 +176,7 @@ Participant's idea: ${transcript}
             resetSession(); // Reset all session-related states
         }
 
-        const fastAPIResponse = await sendResponseToFastAPI(response, selectedPerson.type);
+        const fastAPIResponse = await sendResponseToFastAPI(selectedPerson.type, response);
         console.log("Received from FastAPI:", fastAPIResponse);
     };
 
@@ -192,13 +192,25 @@ Participant's idea: ${transcript}
 	    console.log('text to send to backend:', text);
 	    console.log('api type to send to backend:', type);
         try {
+	    const apiType = selectedPerson.type === "celebrity" ? "elevenlabs" : "d-id"
+
             const response = await axios.post('http://localhost:8000/create-talk', {
                 image_url: selectedPerson.imageUrl,
+		voice_id: selectedPerson.voiceId, 
                 text: text,
-		api_type: type === "celebrity" ? "elevenlabs" : "d-id"
-            });
+		api_type: apiType,
+	    }, {
+		responseType: "blob"
+	    });
+
             console.log('FastAPI response:', response.data);
 	    // this assumes i'll be getting back a video url if doing the public figure.. not sure this is the case?
+	    if (apiType == "elevenlabs") {
+		const audioUrl = URL.createObjectURL(new Blob([response.data]));
+        	const audioPlayer = document.getElementById('audioPlayer');
+        	audioPlayer.src = audioUrl;
+        	audioPlayer.play();
+	    }  
             setVideoUrl(response.data.video_url);
             return response.data;
         } catch (error) {
@@ -241,6 +253,7 @@ Participant's idea: ${transcript}
                 {isLoading && <Box sx={{ display: 'flex' }}><CircularProgress size="large" color="secondary"/></Box>}
                 {responseReady && (
                     <>
+			<audio id="audioPlayer" controls>Your browser does not support the audio element.</audio>
                         <Box height={"100vh"} width={"100%"}>
                             {videoUrl && (
                                 <video style={{width: '100%', height: '100%'}} controls autoPlay>
