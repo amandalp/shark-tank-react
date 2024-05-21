@@ -219,7 +219,7 @@ Participant's idea: ${transcript}
             resetSession(); // Reset all session-related states
         }
 
-        const fastAPIResponse = await sendResponseToFastAPI(response);
+        const fastAPIResponse = await sendResponseToFastAPI(response, selectedPerson.type);
         console.log("Received from FastAPI:", fastAPIResponse);
     };
 
@@ -231,14 +231,17 @@ Participant's idea: ${transcript}
     	setVideoUrl('');
     };
 
-    const sendResponseToFastAPI = async (text) => {
+    const sendResponseToFastAPI = async (type, text) => {
 	    console.log('text to send to backend:', text);
+	    console.log('api type to send to backend:', type);
         try {
             const response = await axios.post('http://localhost:8000/create-talk', {
-                image_url: "https://storage.googleapis.com/amanda-public-bucket/tim_young.png",
-                text: text
+                image_url: selectedPerson.imageUrl,
+                text: text,
+		api_type: type === "celebrity" ? "elevenlabs" : "d-id"
             });
             console.log('FastAPI response:', response.data);
+	    // this assumes i'll be getting back a video url if doing the public figure.. not sure this is the case?
             setVideoUrl(response.data.video_url);
             return response.data;
         } catch (error) {
