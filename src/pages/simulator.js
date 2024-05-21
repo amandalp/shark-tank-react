@@ -53,6 +53,8 @@ const Simulator = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [responseReady, setResponseReady] = useState(false);
     const [apiResponse, setApiResponse] = useState('');
+    const [responseCount, setResponseCount] = useState(0); // Tracks the number of responses for the current user
+    const [sessionActive, setSessionActive] = useState(false); // Tracks if the session is active
     const [videoUrl, setVideoUrl] = useState('');
     const Ref = useRef(null);
 
@@ -155,7 +157,7 @@ const Simulator = () => {
 	clearTimer(getDeadTime());
     };
 
-	// call openai api
+    // call openai api
     const sendTranscriptToOpenAI = async () => {
         if (!transcript.trim()) return 'Please provide a more substantial input.';
 		if (!selectedPerson) return 'Please select a person to pitch to.';
@@ -196,9 +198,25 @@ Participant's idea: ${transcript}
         setApiResponse(response);
         setIsLoading(false);
         setResponseReady(true);
+	setResponseCount(prev => prev + 1); // Increment response count
+
+	if (responseCount === 1) { // After first response, OpenAI should ask a question
+            setSessionActive(true); // Indicates that the session is ongoing
+    	} else if (responseCount === 2) { // After second response, provide final feedback
+            setSessionActive(false); // End session
+            resetSession(); // Reset all session-related states
+        }
 
         const fastAPIResponse = await sendResponseToFastAPI(response);
         console.log("Received from FastAPI:", fastAPIResponse);
+    };
+
+    const resetSession = () => {
+    	setApiResponse('');
+    	setResponseCount(0);
+    	resetTranscript();
+    	setSessionActive(false);
+    	setVideoUrl('');
     };
 
     const sendResponseToFastAPI = async (text) => {
@@ -236,7 +254,7 @@ Participant's idea: ${transcript}
                 	    </IconButton>
         		    </div>
                 	)}
-                	<p>Captions: {transcript}</p>
+                	<Typography fontFamily="Raleway" variant="h6">Captions: {transcript}</Typography>
 		    </>
 		)}
                 {isRecording && (
